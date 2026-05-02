@@ -143,3 +143,5 @@ bombardier -H "Authorization: Token $TOKEN" 'localhost:28080/api/isearch?phrase=
 6. `BROKER_ADDRESS` | Адрес NATS сервера. |
 7. `DB_ADDRESS` | Адрес PostgreSQL. |
 8. `*_ADDRESS` | Адреса маршрутизации для gRPC клиентов (например, `SEARCH_ADDRESS`, `WORDS_ADDRESS`). |
+## Метрики
+<img width="1917" height="1039" alt="изображение" src="https://github.com/user-attachments/assets/03e15184-8496-4fd2-b18d-908b2856cc64" />
