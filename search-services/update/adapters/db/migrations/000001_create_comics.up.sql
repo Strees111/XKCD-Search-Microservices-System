@@ -1,0 +1,7 @@
+CREATE TABLE comics (
+    id SERIAL PRIMARY KEY,
+    xkcd_id INTEGER NOT NULL UNIQUE,
+    url TEXT,
+    words TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+    created_at TIMESTAMP DEFAULT NOW()
+);
