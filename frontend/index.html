@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>xkcd Search System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Стили для плавных анимаций переходов */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes zoomIn {
+            from {
+                transform: scale(0.96);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.2s ease-out forwards;
+        }
+
+        .animate-zoom-in {
+            animation: zoomIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col antialiased">
+
+    <!-- Шапка -->
+    <header class="bg-indigo-600 text-white shadow-md">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold tracking-tight">xkcd Search System</h1>
+            <div id="auth-status" class="text-sm"></div>
+        </div>
+    </header>
+
+    <!-- Навигация -->
+    <nav class="bg-white border-b border-gray-200 shadow-sm">
+        <div class="container mx-auto px-4 flex space-x-8">
+            <button id="tab-search-btn"
+                class="py-4 px-2 border-b-2 border-indigo-500 font-medium text-indigo-600 transition-all duration-200 focus:outline-none">
+                Поиск
+            </button>
+            <button id="tab-admin-btn"
+                class="py-4 px-2 border-b-2 border-transparent font-medium text-gray-500 hover:text-gray-700 transition-all duration-200 focus:outline-none">
+                Управление БД
+            </button>
+            <button id="tab-status-btn"
+                class="py-4 px-2 border-b-2 border-transparent font-medium text-gray-500 hover:text-gray-700 transition-all duration-200 focus:outline-none">
+                Статус системы
+            </button>
+        </div>
+    </nav>
+
+    <!-- Основной контент -->
+    <main class="container mx-auto px-4 py-8 flex-grow">
+
+        <!-- ВКЛАДКА: ПОИСК -->
+        <section id="tab-search" class="space-y-6">
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                <h2 class="text-lg font-semibold mb-4 text-gray-900">Выполнение поиска</h2>
+                <form id="search-form" class="space-y-4">
+                    <div class="flex flex-col lg:flex-row gap-4">
+                        <input type="text" id="search-query" placeholder="Введите поисковый запрос..." required
+                            class="flex-grow px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-150">
+
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <select id="search-type"
+                                class="px-4 py-2 border border-gray-300 rounded-md bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all duration-150">
+                                <option value="standard">Обычный поиск</option>
+                                <option value="indexed">Индексированный поиск</option>
+                            </select>
+
+                            <select id="search-limit"
+                                class="px-4 py-2 border border-gray-300 rounded-md bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all duration-150">
+                                <option value="10">10 результатов</option>
+                                <option value="20">20 результатов</option>
+                                <option value="50">50 результатов</option>
+                                <option value="100">100 результатов</option>
+                                <option value="all">Все результаты</option>
+                            </select>
+
+                            <button type="submit"
+                                class="bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white font-medium py-2 px-6 rounded-md transition-all duration-150">
+                                Найти
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Результаты поиска -->
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                <h3 class="text-md font-semibold mb-3 text-gray-900">Результаты</h3>
+                <div id="search-results-placeholder" class="text-gray-500 text-sm">
+                    Введите запрос для отображения результатов.
+                </div>
+                <div id="search-results-error"
+                    class="hidden text-red-600 text-sm bg-red-50 p-3 rounded-md border border-red-200"></div>
+                <div id="search-results" class="hidden space-y-3"></div>
+            </div>
+        </section>
+
+        <!-- ВКЛАДКА: УПРАВЛЕНИЕ БД -->
+        <section id="tab-admin" class="hidden space-y-6">
+            <!-- Форма авторизации -->
+            <div id="login-section" class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 max-w-md mx-auto">
+                <h2 class="text-lg font-semibold mb-4 text-gray-900 text-center">Авторизация администратора</h2>
+                <form id="login-form" class="space-y-4">
+                    <div>
+                        <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Имя
+                            пользователя</label>
+                        <input type="text" id="username" required
+                            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 outline-none transition-all duration-150">
+                    </div>
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Пароль</label>
+                        <input type="password" id="password" required
+                            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 outline-none transition-all duration-150">
+                    </div>
+                    <button type="submit"
+                        class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 rounded-md transition-all duration-150 active:scale-95">
+                        Войти
+                    </button>
+                    <div id="login-error" class="hidden text-red-600 text-sm text-center"></div>
+                </form>
+            </div>
+
+            <!-- Действия и статистика -->
+            <div id="admin-actions-section" class="hidden grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div
+                    class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 space-y-4 flex flex-col justify-between">
+                    <div>
+                        <h2 class="text-lg font-semibold text-gray-900">Управление индексами</h2>
+                        <p class="text-sm text-gray-600 mt-1">Для выполнения этих операций требуется токен авторизации.
+                        </p>
+                    </div>
+                    <div class="space-y-3 pt-4">
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <button id="btn-db-update"
+                                class="bg-green-600 hover:bg-green-700 text-white font-medium py-2.5 px-4 rounded-md transition duration-150 flex-grow active:scale-95">
+                                Обновить БД
+                            </button>
+                            <button id="btn-db-drop"
+                                class="bg-red-600 hover:bg-red-700 text-white font-medium py-2.5 px-4 rounded-md transition duration-150 flex-grow active:scale-95">
+                                Очистить БД
+                            </button>
+                        </div>
+                        <div id="admin-action-status" class="hidden p-3 rounded-md text-sm"></div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-lg font-semibold text-gray-900">Статус и Статистика БД</h2>
+                        <button id="btn-refresh-stats"
+                            class="text-indigo-600 hover:text-indigo-800 text-sm font-medium transition-colors">Обновить</button>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Статус
+                                процесса</span>
+                            <div
+                                class="flex items-center gap-3 mt-1.5 p-3 bg-indigo-50/30 border border-indigo-100 rounded-lg">
+                                <span class="relative flex h-3.5 w-3.5">
+                                    <span id="status-indicator-ping"
+                                        class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                    <span id="status-indicator-dot"
+                                        class="relative inline-flex rounded-full h-3.5 w-3.5 bg-green-500"></span>
+                                </span>
+                                <div>
+                                    <p id="status-indicator-text"
+                                        class="text-sm font-semibold text-gray-800 capitalize">Загрузка...</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Ключевые
+                                метрики</span>
+                            <div class="grid grid-cols-2 gap-3 mt-1.5">
+                                <div class="bg-gray-50 p-3 rounded-lg border border-gray-100">
+                                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wide">Всего лексем
+                                    </p>
+                                    <p id="stat-words-total" class="text-xl font-bold text-indigo-900 mt-0.5">-</p>
+                                </div>
+                                <div class="bg-gray-50 p-3 rounded-lg border border-gray-100">
+                                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wide">Уникальных
+                                        лексем</p>
+                                    <p id="stat-words-unique" class="text-xl font-bold text-indigo-900 mt-0.5">-</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Индексация
+                                комиксов</span>
+                            <div class="bg-gray-50 p-3 rounded-lg border border-gray-100 mt-1.5">
+                                <div class="flex justify-between items-end">
+                                    <p id="stat-comics-ratio" class="text-base font-bold text-indigo-900">- / -</p>
+                                    <p id="stat-comics-percent" class="text-xs text-indigo-600 font-semibold">-</p>
+                                </div>
+                                <div class="w-full bg-gray-200 h-2 rounded-full mt-2 overflow-hidden">
+                                    <div id="stat-comics-progress"
+                                        class="bg-indigo-600 h-2 rounded-full transition-all duration-500"
+                                        style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pt-2">
+                            <button id="btn-toggle-raw-json"
+                                class="text-[11px] text-gray-400 hover:text-gray-600 underline focus:outline-none transition-colors">Показать
+                                сырые данные JSON</button>
+                            <div id="raw-json-container" class="hidden mt-2 space-y-2 animate-fade-in">
+                                <pre id="db-status-data"
+                                    class="text-[10px] font-mono text-gray-600 overflow-x-auto bg-gray-50 p-2 rounded max-h-32 border border-gray-100">Загрузка...</pre>
+                                <pre id="db-stats-data"
+                                    class="text-[10px] font-mono text-gray-600 overflow-x-auto bg-gray-50 p-2 rounded max-h-32 border border-gray-100">Загрузка...</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ВКЛАДКА: СТАТУС СИСТЕМЫ -->
+        <section id="tab-status" class="hidden space-y-6">
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-lg font-semibold text-gray-900">Опрос компонентов</h2>
+                    <button id="btn-ping"
+                        class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md transition-all duration-150 active:scale-95">
+                        Проверить сейчас
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div
+                        class="border border-gray-200 p-5 rounded-lg bg-white shadow-sm flex flex-col justify-between hover:border-gray-300 transition-colors duration-200">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="font-semibold text-gray-900">Words Service</h3>
+                                <p class="text-xs text-gray-500">Валидация и фильтрация слов</p>
+                            </div>
+                            <span id="ping-words"
+                                class="px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600">Ожидание</span>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-gray-100 text-xs text-gray-400 space-y-1">
+                            <div class="flex justify-between"><span>Задержка:</span><span id="ping-words-latency"
+                                    class="font-mono text-gray-700 font-semibold">-</span></div>
+                            <div class="flex justify-between"><span>Режим работы:</span><span
+                                    class="text-gray-750">Оптимизированный</span></div>
+                        </div>
+                    </div>
+
+                    <div
+                        class="border border-gray-200 p-5 rounded-lg bg-white shadow-sm flex flex-col justify-between hover:border-gray-300 transition-colors duration-200">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="font-semibold text-gray-950 text-base">Update Service</h3>
+                                <p class="text-xs text-gray-500">Парсинг и модификация данных</p>
+                            </div>
+                            <span id="ping-update"
+                                class="px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600">Ожидание</span>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-gray-100 text-xs text-gray-400 space-y-1">
+                            <div class="flex justify-between"><span>Задержка:</span><span id="ping-update-latency"
+                                    class="font-mono text-gray-700 font-semibold">-</span></div>
+                            <div class="flex justify-between"><span>Режим работы:</span><span
+                                    class="text-gray-750">Многопоточный</span></div>
+                        </div>
+                    </div>
+
+                    <div
+                        class="border border-gray-200 p-5 rounded-lg bg-white shadow-sm flex flex-col justify-between hover:border-gray-300 transition-colors duration-200">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="font-semibold text-gray-950 text-base">Search Service</h3>
+                                <p class="text-xs text-gray-500">Высокоскоростной поиск</p>
+                            </div>
+                            <span id="ping-search"
+                                class="px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600">Ожидание</span>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-gray-100 text-xs text-gray-400 space-y-1">
+                            <div class="flex justify-between"><span>Задержка:</span><span id="ping-search-latency"
+                                    class="font-mono text-gray-700 font-semibold">-</span></div>
+                            <div class="flex justify-between"><span>Движок:</span><span class="text-gray-750">Inverted
+                                    Index</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Журнал логов последних проверок -->
+                <div class="mt-8 border-t border-gray-100 pt-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-sm font-bold text-gray-900 tracking-tight">Журнал мониторинга системы</h3>
+                        <button id="btn-clear-logs"
+                            class="text-[11px] text-indigo-600 hover:text-indigo-800 underline focus:outline-none transition-colors">Очистить
+                            журнал</button>
+                    </div>
+                    <div class="overflow-hidden rounded-lg border border-gray-200 shadow-sm bg-white">
+                        <div class="max-h-60 overflow-y-auto">
+                            <table class="min-w-full divide-y divide-gray-200 text-xs">
+                                <thead class="bg-gray-50 sticky top-0 border-b border-gray-200 z-10">
+                                    <tr>
+                                        <th
+                                            class="px-4 py-2.5 text-left text-gray-500 font-semibold uppercase tracking-wider">
+                                            Время</th>
+                                        <th
+                                            class="px-4 py-2.5 text-left text-gray-500 font-semibold uppercase tracking-wider">
+                                            Сервис</th>
+                                        <th
+                                            class="px-4 py-2.5 text-left text-gray-500 font-semibold uppercase tracking-wider">
+                                            Статус</th>
+                                        <th
+                                            class="px-4 py-2.5 text-left text-gray-500 font-semibold uppercase tracking-wider">
+                                            Задержка</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ping-logs" class="divide-y divide-gray-100 text-gray-700 bg-white">
+                                    <tr id="ping-logs-empty">
+                                        <td colspan="4" class="px-4 py-6 text-center text-gray-400 italic">Журнал пуст.
+                                            Запустите проверку для записи логов.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- МОДАЛЬНОЕ ОКНО ДЕТАЛЕЙ КОМИКСА (Анимированное) -->
+    <div id="comic-modal"
+        class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div
+            class="bg-white rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden border border-gray-100">
+            <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+                <h3 id="comic-modal-title" class="text-lg font-bold text-gray-900 truncate">Детали комикса</h3>
+                <button id="comic-modal-close"
+                    class="text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-full p-1 transition-colors duration-200 focus:outline-none text-2xl font-semibold leading-none">&times;</button>
+            </div>
+            <div id="comic-modal-body" class="p-6 overflow-y-auto">
+                <!-- Содержимое генерируется динамически через JS -->
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-gray-100 border-t border-gray-200 py-4 mt-auto">
+        <div class="container mx-auto px-4 text-center text-xs text-gray-500">
+            &copy; 2026 Разработано для курса YADRO. Все права защищены.
+        </div>
+    </footer>
+
+    <script src="app.js?v=20260704-2"></script>
+</body>
+
+</html>
