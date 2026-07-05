@@ -37,7 +37,7 @@ func (db *DB) Search(ctx context.Context, keyword string) ([]int, error) {
 	var IDs []int
 	err := db.conn.SelectContext(
 		ctx, &IDs,
-		"SELECT id FROM comics WHERE $1 = ANY(words)",
+		"SELECT xkcd_id FROM comics WHERE $1 = ANY(words)",
 		keyword,
 	)
 
@@ -45,14 +45,14 @@ func (db *DB) Search(ctx context.Context, keyword string) ([]int, error) {
 }
 
 type Comics struct {
-	ID    int            `db:"id"`
-	URL   string         `db:"url"`
-	Words pq.StringArray `db:"words"`
+	XKCDID int            `db:"xkcd_id"`
+	URL    string         `db:"url"`
+	Words  pq.StringArray `db:"words"`
 }
 
 func toDomain(r Comics) core.Comics {
 	return core.Comics{
-		ID:    r.ID,
+		ID:    r.XKCDID,
 		URL:   r.URL,
 		Words: []string(r.Words),
 	}
@@ -62,7 +62,7 @@ func (db *DB) Get(ctx context.Context, id int) (core.Comics, error) {
 	var comics Comics
 	err := db.conn.GetContext(
 		ctx, &comics,
-		"SELECT id, url, words FROM comics WHERE id = $1",
+		"SELECT xkcd_id, url, words FROM comics WHERE xkcd_id = $1",
 		id,
 	)
 
@@ -73,7 +73,7 @@ func (db *DB) GetAll(ctx context.Context) ([]core.Comics, error) {
 	var rows []Comics
 
 	err := db.conn.SelectContext(ctx, &rows,
-		`SELECT id, url, words FROM comics ORDER BY id`)
+		`SELECT xkcd_id, url, words FROM comics ORDER BY xkcd_id`)
 	if err != nil {
 		return nil, err
 	}

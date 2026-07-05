@@ -7,7 +7,6 @@
     <title>xkcd Search System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Стили для плавных анимаций переходов */
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -42,7 +41,6 @@
 
 <body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col antialiased">
 
-    <!-- Шапка -->
     <header class="bg-indigo-600 text-white shadow-md">
         <div class="container mx-auto px-4 py-4 flex justify-between items-center">
             <h1 class="text-xl font-bold tracking-tight">xkcd Search System</h1>
@@ -50,7 +48,6 @@
         </div>
     </header>
 
-    <!-- Навигация -->
     <nav class="bg-white border-b border-gray-200 shadow-sm">
         <div class="container mx-auto px-4 flex space-x-8">
             <button id="tab-search-btn"
@@ -68,10 +65,8 @@
         </div>
     </nav>
 
-    <!-- Основной контент -->
     <main class="container mx-auto px-4 py-8 flex-grow">
 
-        <!-- ВКЛАДКА: ПОИСК -->
         <section id="tab-search" class="space-y-6">
             <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
                 <h2 class="text-lg font-semibold mb-4 text-gray-900">Выполнение поиска</h2>
@@ -105,7 +100,6 @@
                 </form>
             </div>
 
-            <!-- Результаты поиска -->
             <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
                 <h3 class="text-md font-semibold mb-3 text-gray-900">Результаты</h3>
                 <div id="search-results-placeholder" class="text-gray-500 text-sm">
@@ -117,9 +111,7 @@
             </div>
         </section>
 
-        <!-- ВКЛАДКА: УПРАВЛЕНИЕ БД -->
         <section id="tab-admin" class="hidden space-y-6">
-            <!-- Форма авторизации -->
             <div id="login-section" class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 max-w-md mx-auto">
                 <h2 class="text-lg font-semibold mb-4 text-gray-900 text-center">Авторизация администратора</h2>
                 <form id="login-form" class="space-y-4">
@@ -142,7 +134,6 @@
                 </form>
             </div>
 
-            <!-- Действия и статистика -->
             <div id="admin-actions-section" class="hidden grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div
                     class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 space-y-4 flex flex-col justify-between">
@@ -167,11 +158,6 @@
                 </div>
 
                 <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 space-y-4">
-                    <div class="flex justify-between items-center">
-                        <h2 class="text-lg font-semibold text-gray-900">Статус и Статистика БД</h2>
-                        <button id="btn-refresh-stats"
-                            class="text-indigo-600 hover:text-indigo-800 text-sm font-medium transition-colors">Обновить</button>
-                    </div>
 
                     <div class="space-y-4">
                         <div>
@@ -241,7 +227,6 @@
             </div>
         </section>
 
-        <!-- ВКЛАДКА: СТАТУС СИСТЕМЫ -->
         <section id="tab-status" class="hidden space-y-6">
             <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
                 <div class="flex justify-between items-center mb-6">
@@ -308,7 +293,6 @@
                     </div>
                 </div>
 
-                <!-- Журнал логов последних проверок -->
                 <div class="mt-8 border-t border-gray-100 pt-6">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="text-sm font-bold text-gray-900 tracking-tight">Журнал мониторинга системы</h3>
@@ -350,7 +334,6 @@
 
     </main>
 
-    <!-- МОДАЛЬНОЕ ОКНО ДЕТАЛЕЙ КОМИКСА (Анимированное) -->
     <div id="comic-modal"
         class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
         <div
@@ -361,7 +344,6 @@
                     class="text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-full p-1 transition-colors duration-200 focus:outline-none text-2xl font-semibold leading-none">&times;</button>
             </div>
             <div id="comic-modal-body" class="p-6 overflow-y-auto">
-                <!-- Содержимое генерируется динамически через JS -->
             </div>
         </div>
     </div>
