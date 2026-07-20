@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Вспомогательная функция для очистки токена от возможных кавычек
     function cleanToken(rawToken) {
         if (!rawToken) return null;
         let t = rawToken.trim();
