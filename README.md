@@ -1,4 +1,4 @@
-# XKCD Search Microservices System
+<img width="1783" height="998" alt="изображение" src="https://github.com/user-attachments/assets/6201f3ff-56f6-4ee6-969c-481f4c79a875" /># XKCD Search Microservices System
 
 Данный проект представляет собой полноценную распределенную систему микросервисов для индексации, поиска и ранжирования комиксов XKCD. Проект построен на базе **гексагональной архитектуры (Ports & Adapters)** и демонстрирует взаимодействие сервисов через **REST** и **gRPC**, использование событийно-ориентированной архитектуры (Event-Driven) и паттернов отказоустойчивости.
 
@@ -9,6 +9,10 @@
 - [X] **Kubernetes:** написание манифестов (Deployment, Service, Ingress и др.) и развертывание всей системы в кластере K8s.
 
 ---
+<img width="1783" height="998" alt="изображение" src="https://github.com/user-attachments/assets/f2b518f9-5bb8-40f4-968f-24c484a8799d" />
+<img width="1783" height="998" alt="изображение" src="https://github.com/user-attachments/assets/cf58ea9e-2f12-4655-9e9b-9c2619f8507c" />
+<img width="1783" height="998" alt="изображение" src="https://github.com/user-attachments/assets/509d3c44-c5ec-40c2-b460-a3bbbe66e5e1" />
+
 
 ## Архитектура и микросервисы
 
